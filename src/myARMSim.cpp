@@ -31,6 +31,9 @@ static unsigned char MEM[4000];
 static unsigned int instruction_word;
 static unsigned int operand1;
 static unsigned int operand2;
+static unsigned int Rd;
+static unsigned int opcode;
+static unsigned int imm;
 
 void getOPCode(){
 	unsigned int op = instruction_word;
@@ -119,8 +122,39 @@ void fetch() {
 //reads the instruction register, reads operand1, operand2 from register file, decides the operation to be performed in execute stage
 void decode() {
 	unsigned int conditions = instruction_word >>28;
-	unsigned int opcode = (instruction_word & 0x1E00000)>> 21;
-	cout<<"DECODE : "<<hex<<conditions<<" "<<opcode<<dec;
+	unsigned int instruction_type = (instruction_word >>26) & 0x3;
+	unsigned int Rn=-1,Rm=-1,Rd=-1;
+	// Rn = first operand register
+	// Rd = destination register
+	// Rm = second operand register
+	cout<<"DECODE : Operation is ";
+	//<<hex<<conditions<<" "<<opcode<<dec;
+	if(instruction_type == 0){
+        // data processing type instruction
+        unsigned int immediateBit = (instruction_word >> 25) & 0x1;
+        opcode = (instruction_word & 0x1E00000)>> 21;
+        Rn = (instruction_word >> 16) & 0xF ;
+        Rd = (instruction_word >> 12) & 0xF ;
+
+        if(immediateBit == 0){
+            Rm = instruction_word & 0xF;
+            imm = 0;
+        }
+        else{
+            imm = 1;
+        }
+
+        if(opcode == 4){
+            // add instruction
+            cout<<"Add ";
+        }
+	}
+	else if(instruction_type == 1){
+        // data transfer type instruction
+	}
+	else if(instruction_type == 2){
+        // branching type instruction
+	}
 	cout<<"\n";
 }
 //executes the ALU operation based on ALUop
