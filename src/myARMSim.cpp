@@ -44,29 +44,30 @@ void getOPCode(){
 
 void test(){
     // tests memory loaded or not
-    cout<<hex;
-    for(int i=0; i<32; i++){
-        cout<<(int)MEM[i]<<" ";
-    }
-    cout<<dec<<"\n";
+	cout<<hex;
+	for(int i=0; i<32; i++){
+		cout<<(int)MEM[i]<<" ";
+	}
+	cout<<dec<<"\n";
 }
 
 
 void run_armsim() {
     //test();
-    exec_func = [&] () -> void{
-    	cout<<"unitialised\n";
-    };
-    wb_func = [&] () -> void{
-    	R[Rd] = res;
-    	cout<<"Writing "<<res<<" to R"<<Rd<<'\n';
-    };
+	exec_func = [&] () -> void{
+		cout<<"Nothing happening.\n";
+	};
+	wb_func = [&] () -> void{
+		R[Rd] = res;
+		cout<<"Writing "<<res<<" to R"<<Rd<<'\n';
+	};
 	while(1) {
 		fetch();
 		decode();
 		execute();
 		mem();
 		write_back();
+		cout<<"\n\n\n";
 	}
 }
 
@@ -121,7 +122,7 @@ void swi_exit() {
 //reads from the instruction memory and updates the instruction register
 void fetch() {
 	instruction_word = read_word(MEM,R[15]); // Load instruction from the address pointed by program counter.
-    cout<<"FETCH : Instruction "<<hex<<instruction_word<<" from address 0x"<<(int)(R[15])<<dec<<"\n";
+	cout<<"FETCH : Instruction "<<hex<<instruction_word<<" from address 0x"<<(int)(R[15])<<dec<<"\n";
 	R[15]+=4;
 
 	if(R[15] >=4000){
@@ -138,143 +139,171 @@ void decode() {
 	// Rd = destination register
 	// Rm = second operand register
 	cout<<"DECODE : Operation is ";
-	//<<hex<<conditions<<" "<<opcode<<dec;
+
 	if(instruction_type == 0){
         // data processing type instruction
-        unsigned int immediateBit = (instruction_word >> 25) & 0x1;
-        opcode = (instruction_word & 0x1E00000)>> 21;
-        Rn = (instruction_word >> 16) & 0xF ;
-        Rd = (instruction_word >> 12) & 0xF ;
-        if(immediateBit == 0){
-            Rm = instruction_word & 0xF;
-            imm = 0;
+		unsigned int immediateBit = (instruction_word >> 25) & 0x1;
+		opcode = (instruction_word & 0x1E00000)>> 21;
+		Rn = (instruction_word >> 16) & 0xF ;
+		Rd = (instruction_word >> 12) & 0xF ;
+		::Rd=Rd;
+		operand1 = R[Rn];
 
-            operand1 = R[Rn];
-            operand2 = R[(instruction_word) & 0xF];
-            //cout<<"DEBUG: "<<operand1<<' '<<operand2<<'\n';
-        }
-        else{
-            imm = 1;
+		if(immediateBit == 0){
+            // it is an immediate command, calculate the respective operand2
+			unsigned int shiftAmt = 0;
+			unsigned int Rt = (instruction_word) & 0xF;
 
-            operand1 = R[Rn];
-            operand2 = (instruction_word) & 0xFF;
-            //cout<<"DEBUG: "<<operand1<<' '<<operand2<<'\n';
-        }
-        ::Rd=Rd;
-        if(opcode == 0){
+			if(instruction_word & 0x10 != 0){
+                // this is a shift where shiftamount is inside register
+				shiftAmt = R[(instruction_word >> 8) & 0xF];
+			}
+			else{
+                // shift provided as a constant
+				shiftAmt = (instruction_word>>7) & 0x1F;
+			}
+
+			unsigned int codeShift = (instruction_word >> 5 ) & 0x3;
+			if(codeShift == 0){
+                // Logical left
+				operand2 = ((unsigned)R[Rt] << shiftAmt);
+			}
+			else if(codeShift == 1){
+                // Logical right
+				operand2 = ((unsigned)R[Rt] >> shiftAmt);
+			}
+			else if(codeShift == 2){
+                // Arithmetic right
+				operand2 = ((int)R[Rt] >> shiftAmt);
+			}
+			else if(codeShift == 3){
+                // Rotate right
+				operand2 = ((unsigned int)R[Rt] >> shiftAmt) | ((unsigned int)R[Rt] << (32-shiftAmt));
+			}
+
+		}
+		else{
+            // operand is immediate value as specified in the instruction
+			unsigned int shiftAmt = (instruction_word >> 8 )& 0xF;
+			unsigned int immVal = (instruction_word & 0xFF);
+			operand2 = ((unsigned int)immVal >> shiftAmt) | ((unsigned int)immVal << (32-shiftAmt));
+		}
+
+		if(opcode == 0){
             // and instruction
-            cout<<"And ";
-            exec_func = [] () -> void{
-            	res=operand1&operand2;
-            };
-        }
-        if(opcode == 1){
+			cout<<"AND ";
+			exec_func = [] () -> void{
+				res=operand1&operand2;
+			};
+		}
+		if(opcode == 1){
             // xor instruction
-            cout<<"Xor ";
-            exec_func = [] () -> void{
-            	res=operand1^operand2;
-            };
-        }
-        if(opcode == 2){
+			cout<<"Xor ";
+			exec_func = [] () -> void{
+				res=operand1^operand2;
+			};
+		}
+		if(opcode == 2){
             // sub instruction
-            cout<<"Sub ";
-            exec_func = [] () -> void{
-            	res=operand1-operand2;
-            };
-        }
-        if(opcode == 3){
+			cout<<"Sub ";
+			exec_func = [] () -> void{
+				res=operand1-operand2;
+			};
+		}
+		if(opcode == 3){
             // reverse subtract instruction
-            cout<<"Rsb ";
-            exec_func = [] () -> void{
-            	res=operand2-operand1;
-            };
-        }
-        if(opcode == 4){
+			cout<<"Rsb ";
+			exec_func = [] () -> void{
+				res=operand2-operand1;
+			};
+		}
+		if(opcode == 4){
             // add instruction
-            cout<<"Add ";
-            exec_func = [] () -> void{
-            	res=operand1+operand2;
-            };
-        }
-        if(opcode == 5){
+			cout<<"Add ";
+			exec_func = [] () -> void{
+				res=operand1+operand2;
+			};
+		}
+		if(opcode == 5){
             // add with constant instruction
-            cout<<"Adc ";
-            exec_func = [] () -> void{
-            	res=operand1+operand2+C;
-            };
-        }
-        if(opcode == 6){
+			cout<<"Adc ";
+			exec_func = [] () -> void{
+				res=operand1+operand2+C;
+			};
+		}
+		if(opcode == 6){
             // subtract with constant instruction
-            cout<<"Sbc ";
-            exec_func = [] () -> void{
-            	res=operand1-operand2+C-1;
-            };
-        }
-        if(opcode == 7){
+			cout<<"Sbc ";
+			exec_func = [] () -> void{
+				res=operand1-operand2+C-1;
+			};
+		}
+		if(opcode == 7){
             // reverse subtract with constant instruction
-            cout<<"Rsc ";
-            exec_func = [] () -> void{
-            	res=operand2-operand1+C-1;
-            };
-        }
-        if(opcode == 8){
+			cout<<"Rsc ";
+			exec_func = [] () -> void{
+				res=operand2-operand1+C-1;
+			};
+		}
+		if(opcode == 8){
             // test Op1 AND Op2 instruction
-            cout<<"TST ";
-            exec_func = [] () -> void{
-            	Z = !(operand1&operand2);
-            };
-        }
-        if(opcode == 9){
+			cout<<"TST ";
+			exec_func = [] () -> void{
+				Z = !(operand1&operand2);
+			};
+		}
+		if(opcode == 9){
             // test Op1 XOR Op2 instruction
-            cout<<"TEQ ";
-            exec_func = [] () -> void{
-            	Z = !(operand1^operand2);
-            };
-        }
-        if(opcode == 10){
+			cout<<"TEQ ";
+			exec_func = [] () -> void{
+				Z = !(operand1^operand2);
+			};
+		}
+		if(opcode == 10){
             // test Op1 - Op2 instruction
-            cout<<"CMP ";
-            exec_func = [] () -> void{
-            	N = (operand1-operand2<0);
-            	Z = (operand1-operand2==0);
-            };
-        }
-        if(opcode == 11){
+			cout<<"CMP ";
+			exec_func = [] () -> void{
+				N = (operand1-operand2<0);
+				Z = (operand1-operand2==0);
+			};
+		}
+		if(opcode == 11){
             // test Op1 + Op2 instruction
-            cout<<"CMN ";
-            exec_func = [] () -> void{
-            	N = (operand1+operand2<0);
-            	Z = !(operand1+operand2);
-            };
-        }
-        if(opcode == 12){
+			cout<<"CMN ";
+			exec_func = [] () -> void{
+				N = (operand1+operand2<0);
+				Z = !(operand1+operand2);
+			};
+		}
+		if(opcode == 12){
             // OR instruction
-            cout<<"ORR ";
-            exec_func = [] () -> void{
-            	res=operand1|operand2;
-            };
-        }
-        if(opcode == 13){
+			cout<<"ORR ";
+			exec_func = [] () -> void{
+				res=operand1|operand2;
+			};
+		}
+		if(opcode == 13){
             // Move instruction
-            cout<<"Mov ";
-            exec_func = [] () -> void{
-            	res=operand2;
-            };
-        }
-        if(opcode == 14){
+			cout<<"Mov ";
+			exec_func = [] () -> void{
+				res=operand2;
+			};
+		}
+		if(opcode == 14){
             // Bit Clear: Op1 AND ~Op2 instruction
-            cout<<"BIC ";
-            exec_func = [] () -> void{
-            	res=operand1&(!operand2);
-            };
-        }
-        if(opcode == 15){
+			cout<<"BIC ";
+			exec_func = [] () -> void{
+				res=operand1&(!operand2);
+			};
+		}
+		if(opcode == 15){
             // Negation instruction
-            cout<<"MVN ";
-            exec_func = [] () -> void{
-            	res=~operand2;
-            };
-        }
+			cout<<"MVN ";
+			exec_func = [] () -> void{
+				res=~operand2;
+			};
+		}
+
 	}
 	else if(instruction_type == 1){
         // data transfer type instruction
@@ -283,9 +312,13 @@ void decode() {
         // branching type instruction
 	}
 	cout<<"\n";
+
+
 }
+
 //executes the ALU operation based on ALUop
 void execute() {
+    cout<<"Execute : ";
 	if(instruction_word == 0xEF000011){
 		swi_exit();
 	}
