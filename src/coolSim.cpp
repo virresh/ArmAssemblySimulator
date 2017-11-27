@@ -1,27 +1,26 @@
 
 /*
 
-The project is developed as part of Computer Architecture class
+The project is developed as part of Computer Organisation class
 Project Name: Functional Simulator for subset of ARM Processor
 
-Developer's Name:
-Developer's Email id:
-Date:
-
 */
 
 
-/* myARMSim.cpp
-Purpose of this file: implementation file for myARMSim
+/* coolSim.cpp
+Purpose of this file: implementation file for coolSim core functions
 */
 
-#include "myARMSim.h"
+#include "coolSim.h"
 #include <bits/stdc++.h>
 
 using namespace std;
 
 function<void(void)> exec_func;
 function<void(void)> wb_func;
+function<void(void)> mem_func;
+function<void(void)> waitF;
+
 //Register file
 static unsigned int R[16];
 //flags
@@ -38,36 +37,47 @@ static unsigned int opcode;
 static unsigned int imm;
 static unsigned int res;
 
-void getOPCode(){
-	unsigned int op = instruction_word;
-}
-
-void test(){
-    // tests memory loaded or not
-	cout<<hex;
-	for(int i=0; i<32; i++){
-		cout<<(int)MEM[i]<<" ";
-	}
-	cout<<dec<<"\n";
-}
-
-
-void run_armsim() {
-    //test();
-	exec_func = [&] () -> void{
-		cout<<"Nothing happening.\n";
+void runOnce(){
+    exec_func = [&] () -> void{
+		cout<<"No Execute Operation.";
 	};
+
+	mem_func = [&] () -> void{
+        cout<<"No Memory Operation.";
+	};
+
 	wb_func = [&] () -> void{
 		R[Rd] = res;
-		cout<<"Writing "<<res<<" to R"<<Rd<<'\n';
+		cout<<"Writing "<<res<<" to R"<<Rd<<"\n";
 	};
+
+    fetch();
+    decode();
+    execute();
+    mem();
+    write_back();
+    cout<<"\n";
+    printRegisters();
+    cout<<"\n";
+
+    waitF();
+}
+
+void setWait(function<void(void)> wtF){
+    waitF = wtF;
+}
+
+void printRegisters(){
+    for(int i=0; i<=15; i++){
+        cout<<"R"<<i<<" : "<<R[i]<<"\t";
+    }
+    cout<<"\n";
+    cout<<"N : "<<N<<"\t"<<"C : "<<C<<"\t"<<"V : "<<V<<"\t"<<"Z : "<<Z<<"\n";
+}
+
+void run_armsim() {
 	while(1) {
-		fetch();
-		decode();
-		execute();
-		mem();
-		write_back();
-		cout<<"\n\n\n";
+        runOnce();
 	}
 }
 
@@ -122,7 +132,7 @@ void swi_exit() {
 //reads from the instruction memory and updates the instruction register
 void fetch() {
 	instruction_word = read_word(MEM,R[15]); // Load instruction from the address pointed by program counter.
-	cout<<"FETCH : Instruction "<<hex<<instruction_word<<" from address 0x"<<(int)(R[15])<<dec<<"\n";
+	cout<<"FETCH :\t\tInstruction "<<hex<<instruction_word<<" from address 0x"<<(int)(R[15])<<dec<<"\n";
 	R[15]+=4;
 
 	if(R[15] >=4000){
@@ -138,11 +148,12 @@ void decode() {
 	// Rn = first operand register
 	// Rd = destination register
 	// Rm = second operand register
-	cout<<"DECODE : Operation is ";
+	cout<<"DECODE :\tOperation is ";
 
 	if(instruction_type == 0){
         // data processing type instruction
 		unsigned int immediateBit = (instruction_word >> 25) & 0x1;
+		unsigned int Rt = -1;
 		opcode = (instruction_word & 0x1E00000)>> 21;
 		Rn = (instruction_word >> 16) & 0xF ;
 		Rd = (instruction_word >> 12) & 0xF ;
@@ -150,9 +161,9 @@ void decode() {
 		operand1 = R[Rn];
 
 		if(immediateBit == 0){
-            // it is an immediate command, calculate the respective operand2
+            // it is not an immediate command, calculate the respective operand2
 			unsigned int shiftAmt = 0;
-			unsigned int Rt = (instruction_word) & 0xF;
+			Rt = (instruction_word) & 0xF;
 
 			if(instruction_word & 0x10 != 0){
                 // this is a shift where shiftamount is inside register
@@ -194,55 +205,63 @@ void decode() {
 			cout<<"AND ";
 			exec_func = [] () -> void{
 				res=operand1&operand2;
+				cout<<operand1<<" AND "<<operand2<<" = "<<res;
 			};
 		}
 		if(opcode == 1){
             // xor instruction
-			cout<<"Xor ";
+			cout<<"XOR ";
 			exec_func = [] () -> void{
 				res=operand1^operand2;
+				cout<<operand1<<" XOR "<<operand2<<" = "<<res;
 			};
 		}
 		if(opcode == 2){
             // sub instruction
-			cout<<"Sub ";
+			cout<<"SUB ";
 			exec_func = [] () -> void{
 				res=operand1-operand2;
+				cout<<operand1<<" - "<<operand2<<" = "<<res;
 			};
 		}
 		if(opcode == 3){
             // reverse subtract instruction
-			cout<<"Rsb ";
+			cout<<"RSB ";
 			exec_func = [] () -> void{
 				res=operand2-operand1;
+				cout<<operand2<<" - "<<operand1<<" = "<<res;
 			};
 		}
 		if(opcode == 4){
             // add instruction
-			cout<<"Add ";
+			cout<<"ADD ";
 			exec_func = [] () -> void{
 				res=operand1+operand2;
+				cout<<operand1<<" + "<<operand2<<" = "<<res;
 			};
 		}
 		if(opcode == 5){
             // add with constant instruction
-			cout<<"Adc ";
+			cout<<"ADC ";
 			exec_func = [] () -> void{
 				res=operand1+operand2+C;
+				cout<<operand1<<" + "<<operand2<<" = "<<res<<" (with Carry)";
 			};
 		}
 		if(opcode == 6){
             // subtract with constant instruction
-			cout<<"Sbc ";
+			cout<<"SBC ";
 			exec_func = [] () -> void{
 				res=operand1-operand2+C-1;
+				cout<<operand1<<" - "<<operand2<<" = "<<res<<" (with Carry)";
 			};
 		}
 		if(opcode == 7){
             // reverse subtract with constant instruction
-			cout<<"Rsc ";
+			cout<<"RSC ";
 			exec_func = [] () -> void{
 				res=operand2-operand1+C-1;
+				cout<<operand2<<" - "<<operand1<<" = "<<res<<" (with Carry)";
 			};
 		}
 		if(opcode == 8){
@@ -250,6 +269,7 @@ void decode() {
 			cout<<"TST ";
 			exec_func = [] () -> void{
 				Z = !(operand1&operand2);
+				cout<<" NOT ( "<<operand1<<" AND "<<operand2<<") = "<<Z<<" = Z";
 			};
 		}
 		if(opcode == 9){
@@ -257,6 +277,7 @@ void decode() {
 			cout<<"TEQ ";
 			exec_func = [] () -> void{
 				Z = !(operand1^operand2);
+				cout<<" NOT ( "<<operand1<<" XOR "<<operand2<<") = "<<Z<<" = Z";
 			};
 		}
 		if(opcode == 10){
@@ -264,7 +285,9 @@ void decode() {
 			cout<<"CMP ";
 			exec_func = [] () -> void{
 				N = (operand1-operand2<0);
+				cout<<" ( ("<<operand1<<" - "<<operand2<<") < 0) = "<<N<<" = N";
 				Z = (operand1-operand2==0);
+				cout<<" ( ( "<<operand1<<" AND "<<operand2<<") == 0 ) = "<<Z<<" = Z";
 			};
 		}
 		if(opcode == 11){
@@ -272,7 +295,9 @@ void decode() {
 			cout<<"CMN ";
 			exec_func = [] () -> void{
 				N = (operand1+operand2<0);
-				Z = !(operand1+operand2);
+				cout<<" ( ("<<operand1<<" + "<<operand2<<") < 0) = "<<N<<" = N";
+				Z = !(operand1+operand2);                                                   // Check this again
+				cout<<" NOT ( "<<operand1<<" + "<<operand2<<") = "<<Z<<" = Z";
 			};
 		}
 		if(opcode == 12){
@@ -280,13 +305,15 @@ void decode() {
 			cout<<"ORR ";
 			exec_func = [] () -> void{
 				res=operand1|operand2;
+				cout<<operand1<<" OR "<<operand2<<" = "<<res;
 			};
 		}
 		if(opcode == 13){
             // Move instruction
-			cout<<"Mov ";
+			cout<<"MOV ";
 			exec_func = [] () -> void{
 				res=operand2;
+				cout<<"Moving "<<operand2<<" to R"<<::Rd;
 			};
 		}
 		if(opcode == 14){
@@ -294,6 +321,7 @@ void decode() {
 			cout<<"BIC ";
 			exec_func = [] () -> void{
 				res=operand1&(!operand2);
+				cout<<operand1<<" AND  !("<<operand2<<") = "<<res;
 			};
 		}
 		if(opcode == 15){
@@ -301,8 +329,17 @@ void decode() {
 			cout<<"MVN ";
 			exec_func = [] () -> void{
 				res=~operand2;
+				cout<<"Moving !"<<operand2<<" = "<<!operand2<<" to R"<<::Rd;
 			};
 		}
+		cout<<"\n\t\tFirst Operand is : R"<<Rn<<" = "<<operand1;
+		if(immediateBit == 1){
+            cout<<",\n\t\tSecond immediate Operand is : "<< operand2<<" (after applying rotations)";
+		}
+		else{
+            cout<<",\n\t\tSecond Operand is : R"<<Rt <<" = "<<operand2<<" (after applying shifts)";
+		}
+		cout<<",\n\t\tTarget Register is R"<<Rd;
 
 	}
 	else if(instruction_type == 1){
@@ -311,26 +348,37 @@ void decode() {
 	else if(instruction_type == 2){
         // branching type instruction
 	}
+	else if(instruction_type == 3){
+        // software interrupts
+        cout<<"Software interrupt";
+
+        if(instruction_word == 0xEF000011){
+            exec_func = []() -> void{
+                cout<<"Exiting\n";
+                swi_exit();
+            };
+        }
+	}
 	cout<<"\n";
-
-
 }
 
 //executes the ALU operation based on ALUop
 void execute() {
-    cout<<"Execute : ";
-	if(instruction_word == 0xEF000011){
-		swi_exit();
-	}
+    cout<<"EXECUTE :\t";
 	exec_func();
+	cout<<"\n";
 }
 //perform the memory operation
 void mem(){
-
+    cout<<"MEMORY :\t";
+    mem_func();
+    cout<<"\n";
 }
 //writes the results back to register file
 void write_back() {
+    cout<<"WRITEBACK :\t";
 	wb_func();
+	cout<<"\n";
 }
 
 
