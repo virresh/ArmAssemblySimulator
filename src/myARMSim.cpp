@@ -20,6 +20,8 @@ Purpose of this file: implementation file for myARMSim
 
 using namespace std;
 
+function<void(void)> exec_func;
+function<void(void)> wb_func;
 //Register file
 static unsigned int R[16];
 //flags
@@ -34,6 +36,7 @@ static unsigned int operand2;
 static unsigned int Rd;
 static unsigned int opcode;
 static unsigned int imm;
+static unsigned int res;
 
 void getOPCode(){
 	unsigned int op = instruction_word;
@@ -51,6 +54,13 @@ void test(){
 
 void run_armsim() {
     //test();
+    exec_func = [&] () -> void{
+    	cout<<"unitialised\n";
+    };
+    wb_func = [&] () -> void{
+    	R[Rd] = res;
+    	cout<<"Writing "<<res<<" to R"<<Rd<<'\n';
+    };
 	while(1) {
 		fetch();
 		decode();
@@ -135,18 +145,135 @@ void decode() {
         opcode = (instruction_word & 0x1E00000)>> 21;
         Rn = (instruction_word >> 16) & 0xF ;
         Rd = (instruction_word >> 12) & 0xF ;
-
         if(immediateBit == 0){
             Rm = instruction_word & 0xF;
             imm = 0;
+
+            operand1 = R[Rn];
+            operand2 = R[(instruction_word) & 0xF];
+            //cout<<"DEBUG: "<<operand1<<' '<<operand2<<'\n';
         }
         else{
             imm = 1;
-        }
 
+            operand1 = R[Rn];
+            operand2 = (instruction_word) & 0xFF;
+            //cout<<"DEBUG: "<<operand1<<' '<<operand2<<'\n';
+        }
+        ::Rd=Rd;
+        if(opcode == 0){
+            // and instruction
+            cout<<"And ";
+            exec_func = [] () -> void{
+            	res=operand1&operand2;
+            };
+        }
+        if(opcode == 1){
+            // xor instruction
+            cout<<"Xor ";
+            exec_func = [] () -> void{
+            	res=operand1^operand2;
+            };
+        }
+        if(opcode == 2){
+            // sub instruction
+            cout<<"Sub ";
+            exec_func = [] () -> void{
+            	res=operand1-operand2;
+            };
+        }
+        if(opcode == 3){
+            // reverse subtract instruction
+            cout<<"Rsb ";
+            exec_func = [] () -> void{
+            	res=operand2-operand1;
+            };
+        }
         if(opcode == 4){
             // add instruction
             cout<<"Add ";
+            exec_func = [] () -> void{
+            	res=operand1+operand2;
+            };
+        }
+        if(opcode == 5){
+            // add with constant instruction
+            cout<<"Adc ";
+            exec_func = [] () -> void{
+            	res=operand1+operand2+C;
+            };
+        }
+        if(opcode == 6){
+            // subtract with constant instruction
+            cout<<"Sbc ";
+            exec_func = [] () -> void{
+            	res=operand1-operand2+C-1;
+            };
+        }
+        if(opcode == 7){
+            // reverse subtract with constant instruction
+            cout<<"Rsc ";
+            exec_func = [] () -> void{
+            	res=operand2-operand1+C-1;
+            };
+        }
+        if(opcode == 8){
+            // test Op1 AND Op2 instruction
+            cout<<"TST ";
+            exec_func = [] () -> void{
+            	Z = !(operand1&operand2);
+            };
+        }
+        if(opcode == 9){
+            // test Op1 XOR Op2 instruction
+            cout<<"TEQ ";
+            exec_func = [] () -> void{
+            	Z = !(operand1^operand2);
+            };
+        }
+        if(opcode == 10){
+            // test Op1 - Op2 instruction
+            cout<<"CMP ";
+            exec_func = [] () -> void{
+            	N = (operand1-operand2<0);
+            	Z = (operand1-operand2==0);
+            };
+        }
+        if(opcode == 11){
+            // test Op1 + Op2 instruction
+            cout<<"CMN ";
+            exec_func = [] () -> void{
+            	N = (operand1+operand2<0);
+            	Z = !(operand1+operand2);
+            };
+        }
+        if(opcode == 12){
+            // OR instruction
+            cout<<"ORR ";
+            exec_func = [] () -> void{
+            	res=operand1|operand2;
+            };
+        }
+        if(opcode == 13){
+            // Move instruction
+            cout<<"Mov ";
+            exec_func = [] () -> void{
+            	res=operand2;
+            };
+        }
+        if(opcode == 14){
+            // Bit Clear: Op1 AND ~Op2 instruction
+            cout<<"BIC ";
+            exec_func = [] () -> void{
+            	res=operand1&(!operand2);
+            };
+        }
+        if(opcode == 15){
+            // Negation instruction
+            cout<<"MVN ";
+            exec_func = [] () -> void{
+            	res=~operand2;
+            };
         }
 	}
 	else if(instruction_type == 1){
@@ -162,12 +289,15 @@ void execute() {
 	if(instruction_word == 0xEF000011){
 		swi_exit();
 	}
+	exec_func();
 }
 //perform the memory operation
-void mem() {
+void mem(){
+
 }
 //writes the results back to register file
 void write_back() {
+	wb_func();
 }
 
 

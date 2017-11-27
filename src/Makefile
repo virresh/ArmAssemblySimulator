@@ -1,6 +1,6 @@
 
 all:
-	g++ myARMSim.cpp main.cpp -I ../include -o ../bin/myARMSim
+	g++ myARMSim.cpp main.cpp -I ../include -o ../myARMSim
 
 clean:
-	rm -f *.o *~ *.bak ../bin/myARMSim
+	rm -f *.o *~ *.bak ../myARMSim
