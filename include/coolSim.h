@@ -1,25 +1,25 @@
-/* 
+/*
 
-The project is developed as part of Computer Architecture class
+The project is developed as part of Computer Organisation class
 Project Name: Functional Simulator for subset of ARM Processor
 
-Developer's Name:
-Developer's Email id:
-Date: 
-
 */
 
 
-/* myARMSim.h
-   Purpose of this file: header file for myARMSim
+/* coolSim.h
+   Purpose of this file: header file for coolSim
 */
+
+#include <functional>
 
 void run_armsim();
 void reset_proc();
 void load_program_memory(char* file_name);
 void write_data_memory();
 void swi_exit();
-
+void runOnce();
+void printRegisters();
+extern std::function<void(void)> waitF;
 
 //reads from the instruction memory and updates the instruction register
 void fetch();
