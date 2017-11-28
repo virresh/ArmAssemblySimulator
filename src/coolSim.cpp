@@ -36,6 +36,7 @@ static unsigned int Rd;
 static unsigned int opcode;
 static unsigned int imm;
 static unsigned int res;
+static unsigned int START_OF_MEMORY;
 
 void runOnce(){
     exec_func = [&] () -> void{
@@ -47,8 +48,7 @@ void runOnce(){
 	};
 
 	wb_func = [&] () -> void{
-		R[Rd] = res;
-		cout<<"Writing "<<res<<" to R"<<Rd<<"\n";
+		cout<<"No Write Back Operation.";
 	};
 
     fetch();
@@ -101,9 +101,12 @@ void load_program_memory(char *file_name) {
 		exit(1);
 	}
 	while(fscanf(fp, "%x %x", &address, &instruction) != EOF) {
+		if(instruction&0xF0000000) START_OF_MEMORY = R[13];
+		cout<<"Writing "<<instruction<<" to "<<address<<'\n';
 		write_word(MEM, address, instruction);
 	}
 	fclose(fp);
+	START_OF_MEMORY = R[13];
 }
 
 //writes the data memory in "data_out.mem" file
@@ -207,6 +210,10 @@ void decode() {
 				res=operand1&operand2;
 				cout<<operand1<<" AND "<<operand2<<" = "<<res;
 			};
+			wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
+			};
 		}
 		if(opcode == 1){
             // xor instruction
@@ -214,6 +221,10 @@ void decode() {
 			exec_func = [] () -> void{
 				res=operand1^operand2;
 				cout<<operand1<<" XOR "<<operand2<<" = "<<res;
+			};
+			wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
 			};
 		}
 		if(opcode == 2){
@@ -223,6 +234,10 @@ void decode() {
 				res=operand1-operand2;
 				cout<<operand1<<" - "<<operand2<<" = "<<res;
 			};
+			wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
+			};
 		}
 		if(opcode == 3){
             // reverse subtract instruction
@@ -230,6 +245,10 @@ void decode() {
 			exec_func = [] () -> void{
 				res=operand2-operand1;
 				cout<<operand2<<" - "<<operand1<<" = "<<res;
+			};
+			wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
 			};
 		}
 		if(opcode == 4){
@@ -239,6 +258,10 @@ void decode() {
 				res=operand1+operand2;
 				cout<<operand1<<" + "<<operand2<<" = "<<res;
 			};
+			wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
+			};
 		}
 		if(opcode == 5){
             // add with constant instruction
@@ -246,6 +269,10 @@ void decode() {
 			exec_func = [] () -> void{
 				res=operand1+operand2+C;
 				cout<<operand1<<" + "<<operand2<<" = "<<res<<" (with Carry)";
+			};
+            wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
 			};
 		}
 		if(opcode == 6){
@@ -255,6 +282,10 @@ void decode() {
 				res=operand1-operand2+C-1;
 				cout<<operand1<<" - "<<operand2<<" = "<<res<<" (with Carry)";
 			};
+			wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
+			};
 		}
 		if(opcode == 7){
             // reverse subtract with constant instruction
@@ -262,6 +293,10 @@ void decode() {
 			exec_func = [] () -> void{
 				res=operand2-operand1+C-1;
 				cout<<operand2<<" - "<<operand1<<" = "<<res<<" (with Carry)";
+			};
+			wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
 			};
 		}
 		if(opcode == 8){
@@ -307,6 +342,10 @@ void decode() {
 				res=operand1|operand2;
 				cout<<operand1<<" OR "<<operand2<<" = "<<res;
 			};
+			wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
+			};
 		}
 		if(opcode == 13){
             // Move instruction
@@ -314,6 +353,10 @@ void decode() {
 			exec_func = [] () -> void{
 				res=operand2;
 				cout<<"Moving "<<operand2<<" to R"<<::Rd;
+			};
+			wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
 			};
 		}
 		if(opcode == 14){
@@ -323,6 +366,10 @@ void decode() {
 				res=operand1&(!operand2);
 				cout<<operand1<<" AND  !("<<operand2<<") = "<<res;
 			};
+			wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
+			};
 		}
 		if(opcode == 15){
             // Negation instruction
@@ -330,6 +377,10 @@ void decode() {
 			exec_func = [] () -> void{
 				res=~operand2;
 				cout<<"Moving !"<<operand2<<" = "<<!operand2<<" to R"<<::Rd;
+			};
+			wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
 			};
 		}
 		cout<<"\n\t\tFirst Operand is : R"<<Rn<<" = "<<operand1;
@@ -344,6 +395,60 @@ void decode() {
 	}
 	else if(instruction_type == 1){
         // data transfer type instruction
+        opcode = (instruction_word & 0x03F00000)>> 20;
+        Rn = (instruction_word >> 16) & 0xF ;
+        Rd = (instruction_word >> 12) & 0xF ;
+        unsigned int offset = instruction_word & 0xFFF;
+        if((instruction_word&(1<<25))==0){
+        	unsigned int shiftAmt = offset>>4;
+        	unsigned int Rt = offset & 0xF;
+        	unsigned int codeShift = (instruction_word >> 5 ) & 0x3;
+			if(codeShift == 0){
+                // Logical left
+				operand2 = ((unsigned)R[Rt] << shiftAmt);
+			}
+			else if(codeShift == 1){
+                // Logical right
+				operand2 = ((unsigned)R[Rt] >> shiftAmt);
+			}
+			else if(codeShift == 2){
+                // Arithmetic right
+				operand2 = ((int)R[Rt] >> shiftAmt);
+			}
+			else if(codeShift == 3){
+                // Rotate right
+				operand2 = ((unsigned int)R[Rt] >> shiftAmt) | ((unsigned int)R[Rt] << (32-shiftAmt));
+			}
+        	operand2 = R[Rt] << shiftAmt;
+        }
+        else if((instruction_word&(1<<25))==1){
+        	unsigned int shiftAmt = offset>>4;
+        	unsigned int imm = offset & 0xF;
+        	operand2 = ((unsigned int)imm >> shiftAmt) | ((unsigned int)imm << (32-shiftAmt));
+        }
+        operand2 += R[Rn] + 4;
+        ::Rd = Rd;
+        if(opcode==25){
+        	// LDR instruction
+        	cout<<"LDR "<<operand2;
+        	mem_func = [] () -> void{
+        		res = read_word(MEM, operand2);
+        		cout<<"Reading value "<<res<<" from address "<<operand2;
+        	};
+        	wb_func = [] () -> void{
+				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+				R[::Rd] = res;
+			};
+        }
+        if(opcode==24){
+        	// STR instruction
+        	cout<<"STR ";
+        	mem_func = [] () -> void{
+        		write_word(MEM,operand2,R[::Rd]);
+        		cout<<"Writing value "<<R[::Rd]<<" into "<<operand2;
+        	};
+        }
+
 	}
 	else if(instruction_type == 2){
         // branching type instruction
@@ -389,7 +494,6 @@ void write_back() {
 	cout<<"\n";
 }
 
-
 int read_word(unsigned char *mem, unsigned int address) {
 	int *data;
 	data =  (int*) (mem + address);
@@ -400,4 +504,5 @@ void write_word(unsigned char *mem, unsigned int address, unsigned int data) {
 	unsigned int *data_p;
 	data_p = (unsigned int*) (mem + address);
 	*data_p = data;
+	R[13]+=4;
 }
