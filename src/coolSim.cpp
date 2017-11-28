@@ -347,6 +347,14 @@ void decode() {
 	}
 	else if(instruction_type == 2){
         // branching type instruction
+        unsigned int offset= (instruction_word&0xFFFFFF);
+        unsigned int link = (instruction_word>>24)&0x1;
+        offset=offset<<2;
+        if(link==1)	//Checking for branch with link
+        {
+        	R[14]=R[15];	//Saving the current value of the PC in the Link register
+        }
+        R[15]+=offset;	//Adding the Offset to the program counter
 	}
 	else if(instruction_type == 3){
         // software interrupts
