@@ -26,7 +26,7 @@ static unsigned int R[16];
 //flags
 static int N,C,V,Z;
 //memory
-static unsigned char MEM[40000];
+static unsigned char MEM[4000];
 
 //intermediate datapath and control path signals
 static unsigned int instruction_word;
@@ -270,7 +270,7 @@ void decode() {
 				res=operand1+operand2+C;
 				cout<<operand1<<" + "<<operand2<<" = "<<res<<" (with Carry)";
 			};
-			wb_func = [] () -> void{
+            wb_func = [] () -> void{
 				cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
 				R[::Rd] = res;
 			};
@@ -452,6 +452,14 @@ void decode() {
 	}
 	else if(instruction_type == 2){
         // branching type instruction
+        unsigned int offset= (instruction_word&0xFFFFFF);
+        unsigned int link = (instruction_word>>24)&0x1;
+        offset=offset<<2;
+        if(link==1)	//Checking for branch with link
+        {
+        	R[14]=R[15];	//Saving the current value of the PC in the Link register
+        }
+        R[15]+=offset;	//Adding the Offset to the program counter
 	}
 	else if(instruction_type == 3){
         // software interrupts
@@ -485,7 +493,6 @@ void write_back() {
 	wb_func();
 	cout<<"\n";
 }
-
 
 int read_word(unsigned char *mem, unsigned int address) {
 	int *data;
