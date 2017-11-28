@@ -1,6 +1,6 @@
 
 all:
-	g++ myARMSim.cpp main.cpp -I ../include -o ../myARMSim
+	g++ -std=c++14 coolSim.cpp main.cpp -I ../include -o ../bin/coolSim
 
 clean:
-	rm -f *.o *~ *.bak ../myARMSim
+	rm -f *.o *~ *.bak ../bin/coolSim
