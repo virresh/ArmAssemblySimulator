@@ -455,13 +455,22 @@ void decode() {
 	else if(instruction_type == 2){
         // branching type instruction
         unsigned int offset= (instruction_word&0xFFFFFF);
+        if((instruction_word & 0x800000) == 0){	//checking 23rd bit, will be 0 if 24bit offset is positive
+        	//positive number do nothing
+        }
+        else{
+        	//sign extend offset to a negative number
+        	offset = offset | 0xFF80000;
+        }
         unsigned int link = (instruction_word>>24)&0x1;
-        offset=offset<<2;
+        offset=(((int)offset)<<2);
         if(link==1)	//Checking for branch with link
         {
         	R[14]=R[15];	//Saving the current value of the PC in the Link register
         }
         R[15]+=offset;	//Adding the Offset to the program counter
+        cout<<"Jump to : "<<hex<<R[15]<<dec<<"\n";
+        return;
 	}
 	else if(instruction_type == 3){
         // software interrupts
