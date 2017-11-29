@@ -427,10 +427,12 @@ void decode() {
         	operand2 = ((unsigned int)imm >> shiftAmt) | ((unsigned int)imm << (32-shiftAmt));
         }
         operand2 += R[Rn] + 4;
+        cout<<operand2;
         ::Rd = Rd;
+
         if(opcode==25){
         	// LDR instruction
-        	cout<<"LDR "<<operand2;
+        	cout<<"LDR ";
         	mem_func = [] () -> void{
         		res = read_word(MEM, operand2);
         		cout<<"Reading value "<<res<<" from address "<<operand2;
