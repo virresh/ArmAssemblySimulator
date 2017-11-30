@@ -221,7 +221,21 @@ void decode() {
 	// Rm = second operand register
 	cout<<"DECODE :\tOperation is ";
 
-	if(instruction_type == 0){
+	if(!((instruction_word>>21)&0x7F) && (((instruction_word>>4)&0xF)==9)) {
+		cout<<"MUL ";
+		::Rd = (instruction_word >> 16) & 0xF ;
+		operand1 = R[(instruction_word) & 0xF];
+		operand2 = R[(instruction_word >> 8) & 0xF];
+		exec_func = [] () -> void{
+			res=operand1*operand2;
+			cout<<operand1<<" MUL "<<operand2<<" = "<<res;
+		};
+		wb_func = [] () -> void{
+			cout<<"Writing "<<res<<" to R"<<::Rd<<"\n";
+			R[::Rd] = res;
+		};
+	}
+	else if(instruction_type == 0){
         // data processing type instruction
 		unsigned int immediateBit = (instruction_word >> 25) & 0x1;
 		unsigned int Rt = -1;
@@ -230,7 +244,6 @@ void decode() {
 		Rd = (instruction_word >> 12) & 0xF ;
 		::Rd=Rd;
 		operand1 = R[Rn];
-
 		if(immediateBit == 0){
             // it is not an immediate command, calculate the respective operand2
 			unsigned int shiftAmt = 0;
