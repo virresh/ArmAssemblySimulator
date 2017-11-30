@@ -1,9 +1,6 @@
-
 /*
-
 The project is developed as part of Computer Organisation class
 Project Name: Functional Simulator for subset of ARM Processor
-
 */
 
 
@@ -14,6 +11,7 @@ Purpose of this file: implementation file for coolSim core functions
 #include "coolSim.h"
 #include <bits/stdc++.h>
 
+#define MEMSIZE 40000
 using namespace std;
 
 function<void(void)> exec_func;
@@ -26,7 +24,7 @@ static unsigned int R[16];
 //flags
 static int N,C,V,Z;
 //memory
-static unsigned char MEM[4000];
+static unsigned char MEM[MEMSIZE];
 
 //intermediate datapath and control path signals
 static unsigned int instruction_word;
@@ -57,10 +55,8 @@ void runOnce(){
     mem();
     write_back();
     cout<<"\n";
-    printRegisters();
-    cout<<"\n";
-
     waitF();
+    cout<<"\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n\n";
 }
 
 void setWait(function<void(void)> wtF){
@@ -107,6 +103,7 @@ void load_program_memory(char *file_name) {
 	}
 	fclose(fp);
 	START_OF_MEMORY = R[13];
+	R[13] = MEMSIZE - 1;
 }
 
 //writes the data memory in "data_out.mem" file
@@ -119,7 +116,7 @@ void write_data_memory() {
 		return;
 	}
 
-	for(i=0; i < 4000; i = i+4){
+	for(i=START_OF_MEMORY; i < MEMSIZE; i = i+4){
 		fprintf(fp, "%x %x\n", i, read_word(MEM, i));
 	}
 	fclose(fp);
@@ -134,11 +131,14 @@ void swi_exit() {
 
 //reads from the instruction memory and updates the instruction register
 void fetch() {
+	if(R[15] >= START_OF_MEMORY){
+		swi_exit();
+	}
 	instruction_word = read_word(MEM,R[15]); // Load instruction from the address pointed by program counter.
 	cout<<"FETCH :\t\tInstruction "<<hex<<instruction_word<<" from address 0x"<<(int)(R[15])<<dec<<"\n";
 	R[15]+=4;
 
-	if(R[15] >=4000){
+	if(R[15] >=MEMSIZE){
 		cout<<"Out of Memory Error...\n";
 		swi_exit();
 	}
@@ -146,6 +146,74 @@ void fetch() {
 //reads the instruction register, reads operand1, operand2 from register file, decides the operation to be performed in execute stage
 void decode() {
 	unsigned int conditions = instruction_word >>28;
+	bool takeFwd = false;
+	string y = "";
+
+	// a==0 means clear a!=0 means set
+	if(conditions == 0 && (Z!=0) ){
+		// EQ
+		takeFwd = true;
+		y = "EQ";
+	}
+	else if(conditions == 1 && (Z==0) ){
+		// NE
+		takeFwd = true;
+		y = "NE";	
+	}
+	else if(conditions == 2 && (C!=0)){
+		// CS
+		takeFwd = true;	
+	}
+	else if(conditions == 3 && (C==0)){
+		// CC
+		takeFwd = true;	
+	}
+	else if(conditions == 4 && (N!=0)){
+		takeFwd = true;	
+	}
+	else if(conditions == 5 && (N==0)){
+		takeFwd = true;	
+	}
+	else if(conditions == 6 && (V!=0)){
+		takeFwd = true;	
+	}
+	else if(conditions == 7 && (V==0)){
+		takeFwd = true;	
+	}
+	else if(conditions == 8 && (C!=0 && Z==0)){
+		takeFwd = true;	
+	}
+	else if(conditions == 9 && (C==0 || Z!=0) ){
+		takeFwd = true;	
+	}
+	else if(conditions == 10 && (N==V) ){
+		takeFwd = true;	
+		y = "GE";
+	}
+	else if(conditions == 11 && (N!=V) ){
+		takeFwd = true;	
+		y = "LT";
+	}
+	else if(conditions == 12 && (Z==0 && (N==V)) ){
+		takeFwd = true;	
+		y = "GT";
+	}
+	else if(conditions == 13 && (Z!=0 || (N!=V)) ){
+		takeFwd = true;	
+		y = "LE";
+	}
+	else if(conditions == 14 ){
+		takeFwd = true;	
+	}
+
+	if(takeFwd == false){
+		cout<<"DECODE :\tConditions not met. Ignoring Statement.\n";
+		exec_func = [] () -> void{
+			cout<<"Not Executing this statement.";
+		};
+		return;
+	}
+
 	unsigned int instruction_type = (instruction_word >>26) & 0x3;
 	unsigned int Rn=-1,Rm=-1,Rd=-1;
 	// Rn = first operand register
@@ -168,7 +236,7 @@ void decode() {
 			unsigned int shiftAmt = 0;
 			Rt = (instruction_word) & 0xF;
 
-			if(instruction_word & 0x10 != 0){
+			if((instruction_word & 0x10) != 0){
                 // this is a shift where shiftamount is inside register
 				shiftAmt = R[(instruction_word >> 8) & 0xF];
 			}
@@ -319,9 +387,9 @@ void decode() {
             // test Op1 - Op2 instruction
 			cout<<"CMP ";
 			exec_func = [] () -> void{
-				N = (operand1-operand2<0);
+				N = (operand1<operand2);
 				cout<<" ( ("<<operand1<<" - "<<operand2<<") < 0) = "<<N<<" = N";
-				Z = (operand1-operand2==0);
+				Z = (operand1==operand2);
 				cout<<" ( ( "<<operand1<<" AND "<<operand2<<") == 0 ) = "<<Z<<" = Z";
 			};
 		}
@@ -399,8 +467,8 @@ void decode() {
         Rn = (instruction_word >> 16) & 0xF ;
         Rd = (instruction_word >> 12) & 0xF ;
         unsigned int offset = instruction_word & 0xFFF;
-        if((instruction_word&(1<<25))==0){
-        	unsigned int shiftAmt = offset>>4;
+        if((instruction_word>>25)&1){
+        	unsigned int shiftAmt = offset>>7;
         	unsigned int Rt = offset & 0xF;
         	unsigned int codeShift = (instruction_word >> 5 ) & 0x3;
 			if(codeShift == 0){
@@ -421,16 +489,14 @@ void decode() {
 			}
         	operand2 = R[Rt] << shiftAmt;
         }
-        else if((instruction_word&(1<<25))==1){
-        	unsigned int shiftAmt = offset>>4;
-        	unsigned int imm = offset & 0xF;
-        	operand2 = ((unsigned int)imm >> shiftAmt) | ((unsigned int)imm << (32-shiftAmt));
+        else if(((instruction_word>>25)&1 )== 0){
+        	operand2 = offset;
         }
         operand2 += R[Rn] + 4;
-        cout<<operand2;
         ::Rd = Rd;
 
-        if(opcode==25){
+        // cout<<"lol "<<operand2<<' ';
+        if(opcode%2==1){
         	// LDR instruction
         	cout<<"LDR ";
         	mem_func = [] () -> void{
@@ -442,7 +508,7 @@ void decode() {
 				R[::Rd] = res;
 			};
         }
-        if(opcode==24){
+        if(opcode%2==0){
         	// STR instruction
         	cout<<"STR ";
         	mem_func = [] () -> void{
@@ -460,26 +526,52 @@ void decode() {
         }
         else{
         	//sign extend offset to a negative number
-        	offset = offset | 0xFF80000;
+        	//offset = offset | 0xFF80000;
+        	unsigned int extend = (offset&0x800000)<<1, j;
+      		for(int j=8;j--; extend<<=1) offset+=extend;
         }
         unsigned int link = (instruction_word>>24)&0x1;
-        offset=(((int)offset)<<2);
+        offset<<=2;
         if(link==1)	//Checking for branch with link
         {
         	R[14]=R[15];	//Saving the current value of the PC in the Link register
         }
-        R[15]+=offset;	//Adding the Offset to the program counter
+        R[15]+=(int)offset+4;	//Adding the Offset to the program counter
+        cout<<"B"+y<<"\n\t\t";
         cout<<"Jump to : "<<hex<<R[15]<<dec<<"\n";
         return;
 	}
 	else if(instruction_type == 3){
         // software interrupts
-        cout<<"Software interrupt";
+        cout<<"SWI : Software interrupt";
 
         if(instruction_word == 0xEF000011){
             exec_func = []() -> void{
                 cout<<"Exiting\n";
                 swi_exit();
+            };
+        }
+        else if(instruction_word == 0xEF00006C){
+        	// read integer
+			exec_func = []() -> void{
+                cout<<"Input integer : \n\t\t";
+                cin>>R[0];
+            };
+
+            wb_func = []() -> void{
+                cout<<"Writing "<<R[0]<<" to R0\n";
+            };
+        }
+        else if(instruction_word == 0xEF00006B){
+        	// write integer
+			exec_func = []() -> void{
+				cout<<"Printing R1 \t";
+                if(R[0] == 1){
+                	cout<<dec<<(unsigned)R[1]<<"\n";
+                }
+                else if(R[0] == 2){
+                	cerr<<dec<<(unsigned)R[1]<<"\n";
+                }
             };
         }
 	}

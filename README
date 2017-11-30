@@ -17,17 +17,17 @@ CS112-Project
   |
   |- bin
       |
-      |- myARMSim
+      |- coolSim
   |- doc
       |
       |- design-doc.docx
   |- include
       |
-      |- myARMSim.h
+      |- coolSim.h
   |- src
-      |- main.c
+      |- main.cpp
       |- Makefile
-      |- myARMSim.h
+      |- coolSim.h
   |- test
       |- simple_add.mem
       |- fib.mem

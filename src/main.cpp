@@ -14,6 +14,7 @@ Project Name: Functional Simulator for subset of ARM Processor
 
 #include "coolSim.h"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -44,8 +45,12 @@ int main(int argc, char** argv) {
   }
   else{
     waitF = []() -> void{
-        char x[2];
-        cin.getline(x,2);
+        string x;
+        cout<<"\nWant to See registers ? (y/n)\n";
+        cin>>x;
+        if(x == "y"){
+          printRegisters();
+        }
     };
   }
 
