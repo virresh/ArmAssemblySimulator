@@ -1,0 +1,476 @@
+Writing 3818913792 to 0
+Writing 4009754732 to 4
+Writing 3785383936 to 8
+Writing 3818930176 to 12
+Writing 3818934272 to 16
+Writing 3818913792 to 20
+Writing 4009754732 to 24
+Writing 3766763520 to 28
+Writing 3800387585 to 32
+Writing 3780444166 to 36
+Writing 3137339385 to 40
+Writing 3818913793 to 44
+Writing 3785363460 to 48
+Writing 4009754731 to 52
+Writing 4009754641 to 56
+FETCH :		Instruction e3a00000 from address 0x0
+DECODE :	Operation is MOV 
+		First Operand is : R0 = 0,
+		Second immediate Operand is : 0 (after applying rotations),
+		Target Register is R0
+EXECUTE :	Moving 0 to R0
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 0 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction ef00006c from address 0x4
+DECODE :	Operation is SWI : Software interrupt
+EXECUTE :	Input integer : 
+		
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 5 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e1a06000 from address 0x8
+DECODE :	Operation is MOV 
+		First Operand is : R0 = 5,
+		Second Operand is : R0 = 5 (after applying shifts),
+		Target Register is R6
+EXECUTE :	Moving 5 to R6
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 5 to R6
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e3a04000 from address 0xc
+DECODE :	Operation is MOV 
+		First Operand is : R0 = 5,
+		Second immediate Operand is : 0 (after applying rotations),
+		Target Register is R4
+EXECUTE :	Moving 0 to R4
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 0 to R4
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e3a05000 from address 0x10
+DECODE :	Operation is MOV 
+		First Operand is : R0 = 5,
+		Second immediate Operand is : 0 (after applying rotations),
+		Target Register is R5
+EXECUTE :	Moving 0 to R5
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 0 to R5
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e3a00000 from address 0x14
+DECODE :	Operation is MOV 
+		First Operand is : R0 = 5,
+		Second immediate Operand is : 0 (after applying rotations),
+		Target Register is R0
+EXECUTE :	Moving 0 to R0
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 0 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction ef00006c from address 0x18
+DECODE :	Operation is SWI : Software interrupt
+EXECUTE :	Input integer : 
+		
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 1 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e0844000 from address 0x1c
+DECODE :	Operation is ADD 
+		First Operand is : R4 = 0,
+		Second Operand is : R0 = 1 (after applying shifts),
+		Target Register is R4
+EXECUTE :	0 + 1 = 1
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 1 to R4
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e2855001 from address 0x20
+DECODE :	Operation is ADD 
+		First Operand is : R5 = 0,
+		Second immediate Operand is : 1 (after applying rotations),
+		Target Register is R5
+EXECUTE :	0 + 1 = 1
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 1 to R5
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e1550006 from address 0x24
+DECODE :	Operation is CMP 
+		First Operand is : R5 = 1,
+		Second Operand is : R6 = 5 (after applying shifts),
+		Target Register is R0
+EXECUTE :	 ( (1 - 5) < 0) = 1 = N ( ( 1 AND 5) == 0 ) = 0 = Z
+MEMORY :	No Memory Operation.
+WRITEBACK :	No Write Back Operation.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction bafffff9 from address 0x28
+DECODE :	Operation is BLT
+		Jump to : 14
+EXECUTE :	No Execute Operation.
+MEMORY :	No Memory Operation.
+WRITEBACK :	No Write Back Operation.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e3a00000 from address 0x14
+DECODE :	Operation is MOV 
+		First Operand is : R0 = 1,
+		Second immediate Operand is : 0 (after applying rotations),
+		Target Register is R0
+EXECUTE :	Moving 0 to R0
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 0 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction ef00006c from address 0x18
+DECODE :	Operation is SWI : Software interrupt
+EXECUTE :	Input integer : 
+		
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 2 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e0844000 from address 0x1c
+DECODE :	Operation is ADD 
+		First Operand is : R4 = 1,
+		Second Operand is : R0 = 2 (after applying shifts),
+		Target Register is R4
+EXECUTE :	1 + 2 = 3
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 3 to R4
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e2855001 from address 0x20
+DECODE :	Operation is ADD 
+		First Operand is : R5 = 1,
+		Second immediate Operand is : 1 (after applying rotations),
+		Target Register is R5
+EXECUTE :	1 + 1 = 2
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 2 to R5
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e1550006 from address 0x24
+DECODE :	Operation is CMP 
+		First Operand is : R5 = 2,
+		Second Operand is : R6 = 5 (after applying shifts),
+		Target Register is R0
+EXECUTE :	 ( (2 - 5) < 0) = 1 = N ( ( 2 AND 5) == 0 ) = 0 = Z
+MEMORY :	No Memory Operation.
+WRITEBACK :	No Write Back Operation.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction bafffff9 from address 0x28
+DECODE :	Operation is BLT
+		Jump to : 14
+EXECUTE :	No Execute Operation.
+MEMORY :	No Memory Operation.
+WRITEBACK :	No Write Back Operation.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e3a00000 from address 0x14
+DECODE :	Operation is MOV 
+		First Operand is : R0 = 2,
+		Second immediate Operand is : 0 (after applying rotations),
+		Target Register is R0
+EXECUTE :	Moving 0 to R0
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 0 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction ef00006c from address 0x18
+DECODE :	Operation is SWI : Software interrupt
+EXECUTE :	Input integer : 
+		
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 3 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e0844000 from address 0x1c
+DECODE :	Operation is ADD 
+		First Operand is : R4 = 3,
+		Second Operand is : R0 = 3 (after applying shifts),
+		Target Register is R4
+EXECUTE :	3 + 3 = 6
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 6 to R4
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e2855001 from address 0x20
+DECODE :	Operation is ADD 
+		First Operand is : R5 = 2,
+		Second immediate Operand is : 1 (after applying rotations),
+		Target Register is R5
+EXECUTE :	2 + 1 = 3
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 3 to R5
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e1550006 from address 0x24
+DECODE :	Operation is CMP 
+		First Operand is : R5 = 3,
+		Second Operand is : R6 = 5 (after applying shifts),
+		Target Register is R0
+EXECUTE :	 ( (3 - 5) < 0) = 1 = N ( ( 3 AND 5) == 0 ) = 0 = Z
+MEMORY :	No Memory Operation.
+WRITEBACK :	No Write Back Operation.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction bafffff9 from address 0x28
+DECODE :	Operation is BLT
+		Jump to : 14
+EXECUTE :	No Execute Operation.
+MEMORY :	No Memory Operation.
+WRITEBACK :	No Write Back Operation.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e3a00000 from address 0x14
+DECODE :	Operation is MOV 
+		First Operand is : R0 = 3,
+		Second immediate Operand is : 0 (after applying rotations),
+		Target Register is R0
+EXECUTE :	Moving 0 to R0
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 0 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction ef00006c from address 0x18
+DECODE :	Operation is SWI : Software interrupt
+EXECUTE :	Input integer : 
+		
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 4 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e0844000 from address 0x1c
+DECODE :	Operation is ADD 
+		First Operand is : R4 = 6,
+		Second Operand is : R0 = 4 (after applying shifts),
+		Target Register is R4
+EXECUTE :	6 + 4 = 10
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 10 to R4
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e2855001 from address 0x20
+DECODE :	Operation is ADD 
+		First Operand is : R5 = 3,
+		Second immediate Operand is : 1 (after applying rotations),
+		Target Register is R5
+EXECUTE :	3 + 1 = 4
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 4 to R5
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e1550006 from address 0x24
+DECODE :	Operation is CMP 
+		First Operand is : R5 = 4,
+		Second Operand is : R6 = 5 (after applying shifts),
+		Target Register is R0
+EXECUTE :	 ( (4 - 5) < 0) = 1 = N ( ( 4 AND 5) == 0 ) = 0 = Z
+MEMORY :	No Memory Operation.
+WRITEBACK :	No Write Back Operation.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction bafffff9 from address 0x28
+DECODE :	Operation is BLT
+		Jump to : 14
+EXECUTE :	No Execute Operation.
+MEMORY :	No Memory Operation.
+WRITEBACK :	No Write Back Operation.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e3a00000 from address 0x14
+DECODE :	Operation is MOV 
+		First Operand is : R0 = 4,
+		Second immediate Operand is : 0 (after applying rotations),
+		Target Register is R0
+EXECUTE :	Moving 0 to R0
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 0 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction ef00006c from address 0x18
+DECODE :	Operation is SWI : Software interrupt
+EXECUTE :	Input integer : 
+		
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 5 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e0844000 from address 0x1c
+DECODE :	Operation is ADD 
+		First Operand is : R4 = 10,
+		Second Operand is : R0 = 5 (after applying shifts),
+		Target Register is R4
+EXECUTE :	10 + 5 = 15
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 15 to R4
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e2855001 from address 0x20
+DECODE :	Operation is ADD 
+		First Operand is : R5 = 4,
+		Second immediate Operand is : 1 (after applying rotations),
+		Target Register is R5
+EXECUTE :	4 + 1 = 5
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 5 to R5
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e1550006 from address 0x24
+DECODE :	Operation is CMP 
+		First Operand is : R5 = 5,
+		Second Operand is : R6 = 5 (after applying shifts),
+		Target Register is R0
+EXECUTE :	 ( (5 - 5) < 0) = 0 = N ( ( 5 AND 5) == 0 ) = 1 = Z
+MEMORY :	No Memory Operation.
+WRITEBACK :	No Write Back Operation.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction bafffff9 from address 0x28
+DECODE :	Conditions not met. Ignoring Statement.
+EXECUTE :	Not Executing this statement.
+MEMORY :	No Memory Operation.
+WRITEBACK :	No Write Back Operation.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e3a00001 from address 0x2c
+DECODE :	Operation is MOV 
+		First Operand is : R0 = 5,
+		Second immediate Operand is : 1 (after applying rotations),
+		Target Register is R0
+EXECUTE :	Moving 1 to R0
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 1 to R0
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction e1a01004 from address 0x30
+DECODE :	Operation is MOV 
+		First Operand is : R0 = 1,
+		Second Operand is : R4 = 15 (after applying shifts),
+		Target Register is R1
+EXECUTE :	Moving 15 to R1
+MEMORY :	No Memory Operation.
+WRITEBACK :	Writing 15 to R1
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction ef00006b from address 0x34
+DECODE :	Operation is SWI : Software interrupt
+EXECUTE :	Printing R1 	15
+
+MEMORY :	No Memory Operation.
+WRITEBACK :	No Write Back Operation.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+FETCH :		Instruction ef000011 from address 0x38
+DECODE :	Operation is SWI : Software interrupt
+EXECUTE :	Exiting

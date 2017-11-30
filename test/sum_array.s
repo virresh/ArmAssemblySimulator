@@ -9,7 +9,7 @@ swi 0x6c	@Input ith number
 add r4, r4, r0	@Updating Sum
 add r5, r5, #1	@Incrementing counter
 cmp r5, r6	@Compare
-ble loop	@branch if r5 <= r6
+blt loop	@branch if r5 <= r6
 mov r0, #1
 mov r1, r4	@Moving Sum to output register
 swi 0x6b
