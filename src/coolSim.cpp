@@ -71,6 +71,15 @@ void printRegisters(){
     cout<<"N : "<<N<<"\t"<<"C : "<<C<<"\t"<<"V : "<<V<<"\t"<<"Z : "<<Z<<"\n";
 }
 
+void printStack(){
+	cout<<"\n";
+	for(int i=R[13]; i<MEMSIZE; i++)
+	{
+		cout<<hex<<"0x"<<i<<" : "<<MEM[i]<<"\n";
+	}
+	cout<<"\n";
+}
+
 void run_armsim() {
 	while(1) {
         runOnce();
